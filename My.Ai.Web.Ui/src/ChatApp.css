@@ -1,0 +1,74 @@
+/* Make the chat app container span 100% of the viewport width */
+#root
+{
+    width: calc(100vw - 80px);
+    margin: auto;
+}
+/* Make the chat app container span 100% of the viewport width */
+.chat-app {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header with Reset Chat button */
+  .chat-header {
+    padding: 10px;
+    text-align: right;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .reset-button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  /* Chat history area */
+  .chat-history {
+    flex: 1;
+    padding: 10px;
+    overflow-y: scroll;
+    border-bottom: 1px solid #ccc;
+    max-height: calc(100vh - 216px);
+    white-space: pre-line;
+  }
+  
+  /* Each message */
+  .message {
+    margin-bottom: 10px;
+  }
+  
+  /* Chat input container */
+  .chat-input {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Text area styling */
+  .text-area {
+    resize: none;
+    height: 60px;
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  /* Send button styling */
+  .send-button {
+    align-self: flex-end;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  

@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Lib", "My.Ai.Lib\My.Ai.Lib.csproj", "{CEFF228E-83C8-45E5-9F8B-5F58339521C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Lib.Test", "My.Ai.Lib.Test\My.Ai.Lib.Test.csproj", "{ABDEA623-905E-4042-9DE9-461268CCAF18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Web", "My.Ai.Web\My.Ai.Web.csproj", "{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEFF228E-83C8-45E5-9F8B-5F58339521C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEFF228E-83C8-45E5-9F8B-5F58339521C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEFF228E-83C8-45E5-9F8B-5F58339521C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEFF228E-83C8-45E5-9F8B-5F58339521C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABDEA623-905E-4042-9DE9-461268CCAF18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABDEA623-905E-4042-9DE9-461268CCAF18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABDEA623-905E-4042-9DE9-461268CCAF18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABDEA623-905E-4042-9DE9-461268CCAF18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

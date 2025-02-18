@@ -1,0 +1,11 @@
+/.DS_Store
+/.vscode
+/bin
+bin
+bin/*
+llm
+obj
+public
+!My.Ai.Web/wwwroot/
+My.Ai.Web/wwwroot/*
+!My.Ai.Web/wwwroot/
