@@ -6,6 +6,3 @@ bin/*
 llm
 obj
 public
-!My.Ai.Web/wwwroot/
-My.Ai.Web/wwwroot/*
-!My.Ai.Web/wwwroot/
