@@ -12,4 +12,9 @@
     <PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.21.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models/" />
+    <Folder Include="ViewModels/" />
+  </ItemGroup>
+
 </Project>

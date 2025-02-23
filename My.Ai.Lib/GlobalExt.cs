@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using LLama.Common;
@@ -42,6 +43,13 @@ public static class GlobalExt
         ContextSize = ContextSize, 
         GpuLayerCount = GpuLayerCount
     };
+
+
+    public static Func<string, uint, int, ModelParams> ModelParamsDelegate() => delegate (string ModelPath, uint ContextSize, int GpuLayerCount)
+    {
+        return ModelPath.ToModelParams(ContextSize, GpuLayerCount);
+    };
+        
 
     public static List<string> DefaultAntiPrompt = new List<string>(){"User:"};
     public static InferenceParams ToInferenceParams(this List<string> AntiPrompts, int MaxTokens = -1) => new InferenceParams(){AntiPrompts = AntiPrompts, MaxTokens = MaxTokens, SamplingPipeline = new DefaultSamplingPipeline()};

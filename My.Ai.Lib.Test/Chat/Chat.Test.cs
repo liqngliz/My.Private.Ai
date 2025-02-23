@@ -9,6 +9,7 @@ using LLama.Common;
 using LLama.Sampling;
 namespace My.Ai.Lib.Test;
 
+[Collection("Sequential")]
 public class ChatTest
 {   
     readonly ChatHistory _chatHistory;

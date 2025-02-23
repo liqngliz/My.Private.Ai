@@ -1,6 +1,15 @@
+using Autofac;
 using GlobalExtensions;
 using LLama.Common;
+using My.Ai.App.Lib.ViewModels;
 using My.Ai.Lib;
+using My.Ai.Lib.Container;
+
+//AIContainer
+var container = new AIContainer("settings.json", "Chat.History.Template.json", "fileMetas.json").Container();
+var chatViewModelFactory = container.Resolve<Func<ChatMode, IChatViewModel>>();
+var statelessChatViewModel = chatViewModelFactory(ChatMode.Stateless);
+//
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,26 +44,8 @@ app.MapGet("/New", async () => {
 
 
 app.MapPost("/Chat", async (ChatHistory chatHistory) => {
-    var llmFolder = "llm".LlmFolder();
-    var modelPath = Path.Combine(llmFolder, "DeepSeek-R1-Distill-Qwen-7B-Q5_K_M.gguf");
-    var modelParams = modelPath.ToModelParams(80000);
-
-    if(chatHistory.Messages.Count < 2) return chatHistory;
-
-    var input = chatHistory.Messages[chatHistory.Messages.Count - 1];
-    var messages = new List<ChatHistory.Message>();
-    
-    for(int i = 0; i < chatHistory.Messages.Count - 1; i++)
-    {
-        messages.Add(chatHistory.Messages[i]);
-    }
-
-    using var chat = new Chat(modelParams, new ChatHistory(messages.ToArray()));
-    var inferenceParams = GlobalExt.DefaultAntiPrompt.ToInferenceParams(4096);
-    await foreach(var text in chat.Prompt(input, inferenceParams))
-        _ = text;
-
-    return chat.History();
+    var chat = await statelessChatViewModel.ChatAsync(chatHistory);
+    return (ChatHistory)chat;
 }).WithName("Chat")
 .WithOpenApi();
 
