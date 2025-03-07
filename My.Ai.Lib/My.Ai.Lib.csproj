@@ -17,4 +17,22 @@
     <Folder Include="ViewModels/" />
   </ItemGroup>
 
+<!--
+  <PropertyGroup>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="LLamaSharp.CPU.CpuType" Value="avx2" />
+  </ItemGroup>
+
+<Target Name="FilterRuntimes" BeforeTargets="PublishBuild">
+  <ItemGroup>
+    <Content Remove="$(NuGetPackageRoot)llamasharp.backend.cpu/0.21.0/runtimes/linux-x64/native/avx/**" />
+    <Content Remove="$(NuGetPackageRoot)llamasharp.backend.cpu/0.21.0/runtimes/linux-x64/native/avx512/**" />
+    <Content Remove="$(NuGetPackageRoot)llamasharp.backend.cpu/0.21.0/runtimes/linux-x64/native/noavx/**" />
+  </ItemGroup>
+</Target>
+-->
 </Project>
