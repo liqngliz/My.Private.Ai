@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Lib.Test", "My.Ai.Lib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Web", "My.Ai.Web\My.Ai.Web.csproj", "{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Ai.Application", "My.Ai.Application\My.Ai.Application.csproj", "{3AAAB3FF-5222-4545-B41A-B3ED237C0A25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C01C7DA-7680-4C57-8ABE-6AE31E0B5EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AAAB3FF-5222-4545-B41A-B3ED237C0A25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AAAB3FF-5222-4545-B41A-B3ED237C0A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AAAB3FF-5222-4545-B41A-B3ED237C0A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AAAB3FF-5222-4545-B41A-B3ED237C0A25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

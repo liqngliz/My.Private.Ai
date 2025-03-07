@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <Folder Include="Models/" />
-    <Folder Include="ViewModels/" />
+    <Folder Include="ChatModels/" />
   </ItemGroup>
 
 <!--
