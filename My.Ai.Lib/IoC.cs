@@ -26,7 +26,7 @@ public class AIContainer : IContainer
         settings.ModelPath = modelPath;
         settingsJson = (string)settings;
 
-        History baseChat = baseChatJson.ToChatHistory();
+        History baseChat = baseChatJson.ToHistory();
 
         builder.RegisterInstance(baseChat).Named<History>("baseChat");
         builder.Register<Func<ChatMode, IChatModel>>(c => {

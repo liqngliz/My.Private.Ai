@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import './ChatApp.css';
 
 type Message = {
-  author_role: "System" | "User" | "Assistant";
+  authorRole: "System" | "User" | "Assistant";
   content: string;
 };
 
@@ -51,8 +51,8 @@ const ChatApp: React.FC = () => {
     if (!input.trim()) return;
     const messageContent = input;
     // Create the user's message and a placeholder for the assistant's reply
-    const userMessage: Message = { author_role: "User", content: messageContent };
-    const placeholderMessage: Message = { author_role: "Assistant", content: "...." };
+    const userMessage: Message = { authorRole: "User", content: messageContent };
+    const placeholderMessage: Message = { authorRole: "Assistant", content: "...." };
 
     // Optimistically update the displayed messages with the user's message and placeholder.
     // Note: We do not include the placeholder in the conversation sent to the API.
@@ -116,10 +116,10 @@ const ChatApp: React.FC = () => {
           <div
             key={index}
             className={`message ${
-              msg.author_role === "Assistant" && msg.content === "...." ? "pending" : ""
+              msg.authorRole === "Assistant" && msg.content === "...." ? "pending" : ""
             }`}
           >
-            <strong>{msg.author_role}: </strong>
+            <strong>{msg.authorRole}: </strong>
             <span>{msg.content}</span>
           </div>
         ))}

@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using LLama.Common;
 using LLama.Sampling;
+using My.Ai.App.Lib.Models;
 
 namespace GlobalExtensions;
 
@@ -38,6 +39,14 @@ public static class GlobalExt
         if(res == null) throw new NullReferenceException("No Chat history found");
         return res;
     }
+
+    public static History ToHistory(this string HistoryJson) 
+    {
+        History? res = JsonSerializer.Deserialize<History>(HistoryJson);
+        if(res == null) throw new NullReferenceException("No Chat history found");
+        return res;
+    }
+    
     public static ModelParams ToModelParams(this string ModelPath, uint ContextSize = 128000, int GpuLayerCount = -1) => new ModelParams(ModelPath)
     {
         ContextSize = ContextSize, 

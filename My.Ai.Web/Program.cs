@@ -41,16 +41,16 @@ app.MapGet("/", async (HttpContext context) => {
 }).ExcludeFromDescription();
 
 app.MapGet("/New", async () => {
-    ChatHistory newHistory = (await File.ReadAllTextAsync("Chat.History.Template.json")).ToChatHistory();
+    History newHistory = (await File.ReadAllTextAsync("Chat.History.Template.json")).ToHistory();
     return newHistory;
 })
 .WithName("NewChat")
 .WithOpenApi();
 
 
-app.MapPost("/Chat", async (ChatHistory chatHistory) => {
+app.MapPost("/Chat", async (History chatHistory) => {
     var chat = await statelessChatViewModel.ChatAsync(chatHistory);
-    return (ChatHistory)chat;
+    return (History)chat;
 }).WithName("Chat")
 .WithOpenApi();
 

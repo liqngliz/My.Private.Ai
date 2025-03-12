@@ -3,13 +3,13 @@ using LLama.Common;
 using My.Ai.App.Lib.Models;
 using My.Ai.App.Lib.ChatModels;
 
-namespace My.Ai.Lib.Test.ViewModels;
+namespace My.Ai.Lib.Test.ChatSession;
 
 [Collection("Sequential")]
-public class ChatViewModelTest
+public class ChatSessionTest
 {
     readonly string _settings;
-    public ChatViewModelTest()
+    public ChatSessionTest()
     {
         var settings = @"{
   ""ModelPath"": ""DeepSeek-R1-Distill-Qwen-7B-Q5_K_M.gguf"",
