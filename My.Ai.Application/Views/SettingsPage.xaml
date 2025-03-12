@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:My.Ai.App.ViewModels"
+             x:Class="My.Ai.App.SettingsPage"
+             Title="Settings">
+    
+    <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Start">
+        <Label 
+            Text="Settings"
+            SemanticProperties.HeadingLevel="Level1"
+            FontSize="32"
+            HorizontalOptions="Center" />
+
+        <Frame BorderColor="Gray" Padding="10" Margin="0,20,0,0">
+            <VerticalStackLayout Spacing="15">
+                <Label Text="Username" FontAttributes="Bold" />
+                <Entry Text="{Binding Username}" Placeholder="Enter your username" />
+                
+                <Label Text="App Theme" FontAttributes="Bold" Margin="0,10,0,0" />
+                <HorizontalStackLayout Spacing="10">
+                    <Switch IsToggled="{Binding IsDarkMode}" />
+                    <Label Text="Dark Mode" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Button 
+            Text="Save Settings"
+            Command="{Binding SaveCommand}"
+            HorizontalOptions="Center"
+            Margin="0,20,0,0" />
+    </VerticalStackLayout>
+</ContentPage>

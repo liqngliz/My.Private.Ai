@@ -1,0 +1,12 @@
+{
+    "Metas": [
+      {
+        "Path": "C:/Files/File1.txt",
+        "Description": "Description of File1"
+      },
+      {
+        "Path": "C:/Files/File2.txt",
+        "Description": "Description of File2"
+      }
+    ]
+  }

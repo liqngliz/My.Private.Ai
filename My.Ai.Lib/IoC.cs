@@ -5,7 +5,7 @@ using Autofac.Core;
 using GlobalExtensions;
 using LLama.Common;
 using My.Ai.App.Lib.Models;
-using My.Ai.App.Lib.ViewModels;
+using My.Ai.App.Lib.ChatModels;
 
 namespace My.Ai.Lib.Container;
 
@@ -18,33 +18,18 @@ public class AIContainer : IContainer
 {
     readonly Autofac.IContainer _container;
 
-    public AIContainer(string settingsPath, string baseChatPath, string fileMetasPath)
+    public AIContainer(string settingsJson, string baseChatJson, string modelPath)
     {
         var builder = new ContainerBuilder();
 
-        string settingsJson = File.ReadAllText(settingsPath);
         Settings settings = settingsJson;
-        settings.ModelPath = Path.Combine("llm".LlmFolder(), settings.ModelPath);
+        settings.ModelPath = modelPath;
         settingsJson = (string)settings;
-        History baseChat = File.ReadAllText(baseChatPath).ToChatHistory();
-        string fileMetasJson = File.ReadAllText(fileMetasPath);
-        var fileMetas = new FileMetas(new List<FileMeta>());
-        
-        try
-        {
-            FileMetas metas = JsonSerializer.Deserialize<FileMetas>(fileMetasJson);
-            if(metas != null)
-                fileMetas.Metas.AddRange(metas.Metas);
-        } 
-        catch(Exception e)
-        {
-            //create file metas
-            File.WriteAllText(fileMetasPath, JsonSerializer.Serialize(fileMetas));
-        }
 
-        builder.RegisterInstance(fileMetas).Named<FileMetas>("files");
+        History baseChat = baseChatJson.ToChatHistory();
+
         builder.RegisterInstance(baseChat).Named<History>("baseChat");
-        builder.Register<Func<ChatMode, IChatViewModel>>(c => {
+        builder.Register<Func<ChatMode, IChatModel>>(c => {
             return ContainerExt.ChatViewModelFactory(settingsJson, GlobalExt.ModelParamsDelegate(), baseChat);
         });
 
@@ -63,13 +48,24 @@ public enum ChatMode
 
 public static class ContainerExt
 {
-    public static Func<ChatMode, IChatViewModel> ChatViewModelFactory(string settingsJson, Func<string, uint, int, ModelParams> modelParamsFunc, History baseChat) =>
+    public static Func<ChatMode, IChatModel> ChatViewModelFactory(string settingsJson, Func<string, uint, int, ModelParams> modelParamsFunc, History baseChat) =>
         delegate(ChatMode mode)
         {
             return mode switch
             {
-                ChatMode.Persistent => new ChatViewModelPersistent(settingsJson, modelParamsFunc, baseChat),
-                ChatMode.Stateless => new ChatViewModelStateless(settingsJson, modelParamsFunc),
+                ChatMode.Persistent => new ChatModelPersistent(settingsJson, modelParamsFunc, baseChat),
+                ChatMode.Stateless => new ChatModelStateless(settingsJson, modelParamsFunc),
+                _ => throw new ArgumentException("Chat Mode does not exist")
+            };
+        };
+    
+    public static Func<ChatMode, IChatModel> ChatViewModelFactory(Settings settingsJson, Func<string, uint, int, ModelParams> modelParamsFunc, History baseChat) =>
+        delegate(ChatMode mode)
+        {
+            return mode switch
+            {
+                ChatMode.Persistent => new ChatModelPersistent(settingsJson, modelParamsFunc, baseChat),
+                ChatMode.Stateless => new ChatModelStateless(settingsJson, modelParamsFunc),
                 _ => throw new ArgumentException("Chat Mode does not exist")
             };
         };

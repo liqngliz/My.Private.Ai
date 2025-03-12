@@ -1,7 +1,7 @@
 using My.Ai.App.Lib.Models;
 
-namespace My.Ai.App.Lib.ViewModels;
-public interface IChatViewModel
+namespace My.Ai.App.Lib.ChatModels;
+public interface IChatModel
 {
     public Task<History> ChatAsync(History history);   
 }

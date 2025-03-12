@@ -4,14 +4,22 @@ using My.Ai.App.Lib.Models;
 using My.Ai.Lib;
 
 
-namespace My.Ai.App.Lib.ViewModels;
-public class ChatViewModelPersistent : IChatViewModel , IDisposable
+namespace My.Ai.App.Lib.ChatModels;
+public class ChatModelPersistent : IChatModel , IDisposable
 {   
     readonly Settings _settings;
     readonly Func<string, uint, int, ModelParams> _toModelParams;
     readonly Chat _chat;
 
-    public ChatViewModelPersistent(string settingsJson, Func<string, uint, int, ModelParams> toModelParams, History startingInput)
+    public ChatModelPersistent(string settingsJson, Func<string, uint, int, ModelParams> toModelParams, History startingInput)
+    {
+        _settings = settingsJson;
+        _toModelParams = toModelParams;
+        ModelParams modelParams = _toModelParams(_settings.ModelPath, _settings.ContextSize, _settings.GpuLayerCount);
+        _chat = new Chat(modelParams, (ChatHistory)startingInput);
+    }
+
+    public ChatModelPersistent(Settings settingsJson, Func<string, uint, int, ModelParams> toModelParams, History startingInput)
     {
         _settings = settingsJson;
         _toModelParams = toModelParams;

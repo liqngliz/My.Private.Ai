@@ -4,12 +4,18 @@ using My.Ai.App.Lib.Models;
 using My.Ai.Lib;
 
 
-namespace My.Ai.App.Lib.ViewModels;
-public class ChatViewModelStateless : IChatViewModel
+namespace My.Ai.App.Lib.ChatModels;
+public class ChatModelStateless : IChatModel
 {   
     readonly Settings _settings;
     Func<string, uint, int, ModelParams> _toModelParams;
-    public ChatViewModelStateless(string settingsJson, Func<string, uint, int, ModelParams> toModelParams)
+    public ChatModelStateless(string settingsJson, Func<string, uint, int, ModelParams> toModelParams)
+    {
+        _settings = settingsJson;
+        _toModelParams = toModelParams;
+    }
+
+    public ChatModelStateless(Settings settingsJson, Func<string, uint, int, ModelParams> toModelParams)
     {
         _settings = settingsJson;
         _toModelParams = toModelParams;

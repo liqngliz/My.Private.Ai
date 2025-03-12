@@ -1,7 +1,7 @@
 using GlobalExtensions;
 using LLama.Common;
 using My.Ai.App.Lib.Models;
-using My.Ai.App.Lib.ViewModels;
+using My.Ai.App.Lib.ChatModels;
 
 namespace My.Ai.Lib.Test.ViewModels;
 
@@ -26,7 +26,7 @@ public class ChatViewModelTest
     public void Should_Chat_Stateless()
     {
         var func = GlobalExt.ModelParamsDelegate();
-        IChatViewModel sut = new ChatViewModelStateless(_settings, func);
+        IChatModel sut = new ChatModelStateless(_settings, func);
         History chatHistory = File.ReadAllText("Chat.History.Template.Json").ToChatHistory();
         chatHistory.Messages.Add(new (AuthorRole.User.ConvertToString(), "Are you DeepSeek?"));
         var actual = sut.ChatAsync(chatHistory).Result;
@@ -39,7 +39,7 @@ public class ChatViewModelTest
     {
         var func = GlobalExt.ModelParamsDelegate();
         History chatHistory = File.ReadAllText("Chat.History.Template.Json").ToChatHistory();
-        IChatViewModel sut = new ChatViewModelPersistent(_settings, func, chatHistory);
+        IChatModel sut = new ChatModelPersistent(_settings, func, chatHistory);
         var messages = new List<Message>(){new ("User", "Are you from china?")};
         var actual = sut.ChatAsync(messages).Result;
         Assert.True(!string.IsNullOrEmpty(actual.Messages.Last().Content));

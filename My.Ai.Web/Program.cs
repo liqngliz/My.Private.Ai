@@ -1,13 +1,18 @@
 using Autofac;
 using GlobalExtensions;
 using LLama.Common;
-using My.Ai.App.Lib.ViewModels;
+using My.Ai.App.Lib.ChatModels;
+using My.Ai.App.Lib.Models;
 using My.Ai.Lib;
 using My.Ai.Lib.Container;
 
 //AIContainer
-var container = new AIContainer("settings.json", "Chat.History.Template.json", "fileMetas.json").Container();
-var chatViewModelFactory = container.Resolve<Func<ChatMode, IChatViewModel>>();
+var settingsJson = File.ReadAllText("settings.json");
+var chatJson = File.ReadAllText("Chat.History.Template.json");
+Settings settings = settingsJson;
+var modelPath = Path.Combine("llm".LlmFolder(), settings.ModelPath);
+var container = new AIContainer(settingsJson, chatJson, modelPath).Container();
+var chatViewModelFactory = container.Resolve<Func<ChatMode, IChatModel>>();
 var statelessChatViewModel = chatViewModelFactory(ChatMode.Stateless);
 //
 
