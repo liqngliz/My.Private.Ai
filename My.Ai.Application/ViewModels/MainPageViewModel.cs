@@ -73,7 +73,7 @@ public class MainPageViewModel : INotifyPropertyChanged
             },
             canExecute: ()=> !isEditing);
             _chatFactory = chatFactory;
-            //chatModel = _chatFactory(ChatMode.Persistent);
+            chatModel = _chatFactory(ChatMode.Persistent);
             this.history = new ObservableCollection<ViewMessage>(history.Messages.Select(x=> (ViewMessage)x));
             History = new ObservableCollection<ViewMessage>(history.Messages.Select(x=> (ViewMessage)x));
         }

@@ -64,12 +64,18 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<!-- Native references for LLamaSharp on ARM64 MacCatalyst -->
+	<!-- Native references for LLamaSharp on MacCatalyst -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+	    <!-- Dynamic libraries -->
 	    <NativeReference Include="$(PkgLLamaSharp_Backend_Cpu)\runtimes\osx-arm64\native\*.dylib" 
-	                    Kind="Dynamic" 
-	                    SmartLink="False" 
-	                    ForceLoad="True" />
+	                Kind="Dynamic" 
+	                SmartLink="False" 
+	                ForceLoad="True" />
+	
+	    <!-- Metal shaders as BundleResource -->
+	    <BundleResource Include="$(PkgLLamaSharp_Backend_Cpu)\runtimes\osx-arm64\native\*.metal">
+	        <Link>Resources\%(Filename)%(Extension)</Link>
+	    </BundleResource>
 	</ItemGroup>
 
 	<!-- For iOS, we need to handle native libraries differently -->

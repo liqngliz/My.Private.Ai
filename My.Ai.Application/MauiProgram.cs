@@ -24,29 +24,23 @@ public static class MauiProgram
         
         // Add this code here - right after getting appDirectoryPath
                 // Add this code here - right after getting appDirectoryPath
-        #if MACCATALYST
-        try 
-        {
-            // Since you mentioned you're using ARM, we'll hardcode it instead of detecting
-            var nativePath = Path.Combine(appDirectoryPath, "runtimes", "osx-arm64", "native");
-            
-            if (!Directory.Exists(nativePath))
-                Directory.CreateDirectory(nativePath);
-                
-            // Set environment variables for library loading
-            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", nativePath, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", nativePath, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("LLAMACPP_LIB", Path.Combine(nativePath, "libllama.dylib"), EnvironmentVariableTarget.Process);
-            
-            Console.WriteLine($"Set environment variables for LLama native library at: {nativePath}");
+        // At the start of your app
+        try {
+            var assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var baseDir = Path.GetDirectoryName(assemblyLocation);
+
+            // Check for the presence of critical files
+            var file = Directory.GetFiles(baseDir, "*.*", SearchOption.AllDirectories);
+            Console.WriteLine($"Found {file.Length} files in the application directory");
+            var listF = new List<string>();
+            foreach (var f in file.Where(f => f.Contains("ggml") || f.EndsWith(".metal") || f.EndsWith(".dylib"))) {
+                Console.WriteLine($"Found critical file: {f}");
+                listF.Add($"Found critical file: {f}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error setting up native libraries: {ex.Message}");
-            if (ex.InnerException != null)
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        catch (Exception ex) {
+            Console.WriteLine($"Error during startup check: {ex}");
         }
-        #endif
 
         builder
             .UseMauiApp<App>()
@@ -93,7 +87,7 @@ public static class MauiProgram
 		var container = new AIContainer(settingsJson, chatHistoryJson, modelPath).Container();
 		Func<ChatMode,IChatModel> chatViewModelFactory = container.Resolve<Func<ChatMode, IChatModel>>();
 
-        History baseHistory = chatHistoryJson.ToChatHistory();
+        History baseHistory = chatHistoryJson.ToHistory();
         builder.Services.AddSingleton(chatViewModelFactory);
         builder.Services.AddSingleton(baseHistory);
 		#if DEBUG
