@@ -13,6 +13,10 @@
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
+		<!-- Explicitly specify runtime identifiers for MacCatalyst -->
+		<RuntimeIdentifiers Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>
+
+
 		<OutputType>Exe</OutputType>
 		<RootNamespace>My.Ai.App</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -36,6 +40,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+
+		<!-- Define path to LLamaSharp.Backend.Cpu package -->
+		<PkgLLamaSharp_Backend_Cpu>$(NuGetPackageRoot)llamasharp.backend.cpu\0.21.0</PkgLLamaSharp_Backend_Cpu>
+	
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -56,7 +64,24 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<!-- Native references for LLamaSharp on ARM64 MacCatalyst -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+	    <NativeReference Include="$(PkgLLamaSharp_Backend_Cpu)\runtimes\osx-arm64\native\*.dylib" 
+	                    Kind="Dynamic" 
+	                    SmartLink="False" 
+	                    ForceLoad="True" />
+	</ItemGroup>
+
+	<!-- For iOS, we need to handle native libraries differently -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<NativeReference Include="$(PkgLLamaSharp_Backend_Cpu)\runtimes\ios-arm64\native\*.dylib"
+						Kind="Dynamic"
+						SmartLink="False"
+						ForceLoad="True" />
+	</ItemGroup>
+
 	<ItemGroup>
+		<PackageReference Include="LLamaSharp.Backend.Cpu" Version="0.21.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />

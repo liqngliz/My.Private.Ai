@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="My.Ai.App.MainPage">
-
+             xmlns:viewmodels="clr-namespace:My.Ai.App.ViewModels"
+             x:Class="My.Ai.App.MainPage"
+             x:DataType="viewmodels:MainPageViewModel">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -68,10 +69,18 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ScrollView Grid.Column="0" Grid.Row="0">
-                    <StackLayout>
-                         <Label>Chat User</Label>
-                         <Label>Chat Assist</Label>
-                    </StackLayout>
+                     <CollectionView ItemsSource="{Binding History}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:ViewMessage">
+                                <HorizontalStackLayout Padding="15,15,15,0">
+                                    <VerticalStackLayout HorizontalOptions="{Binding Position}">
+                                        <Label FontSize="18" Text="{Binding Role}" ></Label>
+                                        <Label FontSize="16" Padding="0,0,0,0" Text="{Binding Content}"></Label>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
 
                 <StackLayout Grid.Row="1">
@@ -94,8 +103,8 @@
                         </Grid.RowDefinitions>
 
                         <Button Text="Attach" FontSize="24" Grid.Column ="0" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="Black"/>
-                        <Entry Placeholder="Enter text" Grid.Column="1" VerticalOptions="Center"></Entry>
-                        <Button Text="Send" FontSize="24" Grid.Column ="2" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="Black"/>
+                        <Entry x:Name="ChatEntry" ReturnCommand="{Binding Submit}" Text="{Binding Input}" Placeholder="Enter text" Grid.Column="1" VerticalOptions="Center"></Entry>
+                        <Button Command="{Binding Submit}" Text="Send" FontSize="24" Grid.Column ="2" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="Black"/>
                     </Grid>
                 </StackLayout>
             </Grid>

@@ -16,6 +16,9 @@
     <Folder Include="Models/" />
   </ItemGroup>
 
+</Project>
+
+
 <!--
   <PropertyGroup>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -34,4 +37,3 @@
   </ItemGroup>
 </Target>
 -->
-</Project>

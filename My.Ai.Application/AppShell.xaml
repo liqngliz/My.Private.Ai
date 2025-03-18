@@ -4,22 +4,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:My.Ai.App"
-    Shell.FlyoutBehavior="Flyout"
     Title="My.Ai.App">
 
     <Shell.FlyoutHeader>
-        <Grid HeightRequest="200" 
+        <Grid HeightRequest="100" 
               BackgroundColor="#512BD4">
-            <Image Source="dotnet_bot.png" 
-                   HeightRequest="120" 
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
-            <Label Text="My MAUI App"
+            <Label Text="SimpleAI"
                    TextColor="White"
                    FontSize="24"
                    HorizontalOptions="Center"
-                   VerticalOptions="End"
-                   Margin="0,0,0,20" />
+                   VerticalOptions="Center"
+                   Margin="0,0,0,0" />
         </Grid>
     </Shell.FlyoutHeader>
 
