@@ -50,7 +50,11 @@ public class MainPageViewModel : INotifyPropertyChanged
     }
 
         public string CounterText => Count == 1 ? $"Clicked {Count} time" : $"Clicked {Count} times";
-        bool isEditing = false;
+        private bool isEditing;
+        public bool Editable 
+        {
+            get => !isEditing; 
+        }
         public ICommand IncrementCommand { get; }
         public ICommand Submit {get; }
 
@@ -60,7 +64,9 @@ public class MainPageViewModel : INotifyPropertyChanged
             Submit = new Command(
                 execute:async () => {
                 //Save input
+                
                 isEditing = true;
+                OnPropertyChanged(nameof(Editable));
                 string content = Input;
                 Input = string.Empty;
                 var message = new Message("User", content);
@@ -69,6 +75,7 @@ public class MainPageViewModel : INotifyPropertyChanged
                 var response = await chatModel.ChatAsync(latest);
                 History.Add(response.Messages.Last());
                 isEditing = false;
+                OnPropertyChanged(nameof(Editable));
                 (Submit as Command).ChangeCanExecute();
             },
             canExecute: ()=> !isEditing);
@@ -100,8 +107,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         #endregion
 }
 
-public record ViewMessage(string Role, string Content, LayoutOptions Position)
+public record ViewMessage(string Role, string Content, int Position)
 {
     public static implicit operator ViewMessage(Message message) => 
-        new ViewMessage(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? new LayoutOptions() {Alignment = LayoutAlignment.End} : new LayoutOptions() {Alignment = LayoutAlignment.Start} );
+        new ViewMessage(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? 3:0);
 };
