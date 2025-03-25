@@ -61,7 +61,7 @@
             <ScrollView Grid.Column="1" Grid.Row="0">
                     <CollectionView ItemsSource="{Binding History}">
                        <CollectionView.ItemTemplate>
-                           <DataTemplate x:DataType="viewmodels:ViewMessage">
+                           <DataTemplate x:DataType="viewmodels:MessageViewModel">
                                <Grid Padding="15,15,15,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -84,12 +84,33 @@
 
                 <StackLayout Grid.Column="1" Grid.Row="1">
                     <Border/>
-                    <Button 
-                        HorizontalOptions="Fill" 
-                        Padding="0,15" 
-                        BackgroundColor="Transparent" 
-                        Text="Choose Model" 
-                        TextColor="Black"/>
+                    <HorizontalStackLayout Spacing="7" Padding="15,0" HorizontalOptions="Center">
+                        <Border/>
+
+                        <Button
+                            Command="{Binding NewChat}"
+                            IsEnabled="{Binding Editable}" 
+                            HorizontalOptions="Fill" 
+                            Padding="0,15" 
+                            BackgroundColor="Transparent" 
+                            Text="New Chat" 
+                            TextColor="Black" WidthRequest="250"/>
+                        
+                        <Border/>
+
+                        <Button
+                            Command="{Binding ClearChat}"
+                            IsEnabled="{Binding Editable}"
+                            HorizontalOptions="Fill" 
+                            Padding="0,15" 
+                            BackgroundColor="Transparent" 
+                            Text="Clear Chat" 
+                            TextColor="Black" WidthRequest="250"
+                        />
+
+                        <Border/>
+                        
+                    </HorizontalStackLayout>
                     <Border/>
                     <Grid Padding="5,10,5,20">
                         <Grid.ColumnDefinitions>

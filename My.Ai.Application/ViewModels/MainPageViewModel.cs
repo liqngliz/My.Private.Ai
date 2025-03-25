@@ -6,6 +6,7 @@ using System.Windows.Input;
 using LLama.Native;
 using My.Ai.App.Lib.ChatModels;
 using My.Ai.App.Lib.Models;
+using My.Ai.App.Utils;
 using My.Ai.Lib.Container;
 
 
@@ -13,11 +14,14 @@ namespace My.Ai.App.ViewModels;
 
 public class MainPageViewModel : INotifyPropertyChanged
 {   
-    readonly Func<ChatMode,IChatModel> _chatFactory;
+    readonly Func<ChatMode, History, IChatModel> _chatFactory;
+    readonly IHistoryReposity _historyRepository;
+    private string chatGuid = string.Empty;
+    private History baseChat;
     private IChatModel chatModel;
-    private ObservableCollection<ViewMessage> history;
+    private ObservableCollection<MessageViewModel> history;
 
-    public ObservableCollection<ViewMessage> History
+    public ObservableCollection<MessageViewModel> History
     {
         get => history;
         set
@@ -35,80 +39,114 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private int _count;
 
-    public int Count
+    private bool isEditing;
+    public bool Editable 
     {
-        get => _count;
-        set
-        {
-            if (_count != value)
-            {
-                _count = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CounterText));
-            }
-        }
+        get => !isEditing; 
     }
 
-        public string CounterText => Count == 1 ? $"Clicked {Count} time" : $"Clicked {Count} times";
-        private bool isEditing;
-        public bool Editable 
-        {
-            get => !isEditing; 
-        }
-        public ICommand IncrementCommand { get; }
-        public ICommand Submit {get; }
+    public ICommand Submit {get; }
+    public ICommand ClearChat{get; }
+    public ICommand NewChat{get; }
 
-        public MainPageViewModel(Func<ChatMode,IChatModel> chatFactory, History history)
-        {   
-            IncrementCommand = new Command(() => Count++);
-            Submit = new Command(
-                execute:async () => {
-                //Save input
-                
+    public MainPageViewModel(Func<ChatMode, History, IChatModel> chatFactory, IHistoryReposity historyReposity, History history)
+    {   
+        _chatFactory = chatFactory;
+        _historyRepository = historyReposity;
+        Submit = new Command(
+            execute:async () => {
+            isEditing = true;
+            OnPropertyChanged(nameof(Editable));
+            string message = Input;
+            Input = string.Empty;
+
+            await submit(message, History, chatModel);
+            
+            isEditing = false;
+            OnPropertyChanged(nameof(Editable));
+            (Submit as Command).ChangeCanExecute();
+        },
+        canExecute: ()=> !isEditing);
+
+        ClearChat = new Command(
+            execute: () => 
+            {
                 isEditing = true;
-                OnPropertyChanged(nameof(Editable));
-                string content = Input;
-                Input = string.Empty;
-                var message = new Message("User", content);
-                History.Add(message);
-                var latest = new History(new List<Message>(){message});
-                var response = await chatModel.ChatAsync(latest);
-                History.Add(response.Messages.Last());
+                clearChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+                History.Clear();
                 isEditing = false;
-                OnPropertyChanged(nameof(Editable));
-                (Submit as Command).ChangeCanExecute();
+                (ClearChat as Command).ChangeCanExecute();
             },
-            canExecute: ()=> !isEditing);
-            _chatFactory = chatFactory;
-            chatModel = _chatFactory(ChatMode.Persistent);
-            this.history = new ObservableCollection<ViewMessage>(history.Messages.Select(x=> (ViewMessage)x));
-            History = new ObservableCollection<ViewMessage>(history.Messages.Select(x=> (ViewMessage)x));
-        }
+            canExecute: ()=> !isEditing
+        );
 
-        #region INotifyPropertyChanged Implementation
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        NewChat = new Command(
+            execute: ()=>
+            {   
+                isEditing = true;
+                saveChat(chatGuid, chatModel.GetHistory().Result, _historyRepository);
+                clearChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+                History.Clear();
+                chatGuid = string.Empty;
+                isEditing = false;
+                (NewChat as Command).ChangeCanExecute();
+            },
+            canExecute: ()=> !isEditing
+        );
 
-        bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Object.Equals(storage, value))
-                return false;
-    
-            storage = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
+        baseChat = history;
+        chatModel = _chatFactory(ChatMode.Persistent, baseChat);
+        this.history = new ObservableCollection<MessageViewModel>();
+        History = new ObservableCollection<MessageViewModel>();
+    }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        #endregion
+    private async Task submit(string message, ObservableCollection<MessageViewModel> history, IChatModel chatModel)
+    {
+        var msg = new Message("User", message);
+        history.Add(msg);
+        var latest = new History(new List<Message>(){msg});
+        var response = await chatModel.ChatAsync(latest);
+        history.Add(response.Messages.Last());
+    }
+
+    private void clearChat(out IChatModel model, Func<ChatMode, History, IChatModel> factory, ChatMode chatMode, History history)
+    {
+        model = factory(chatMode, history);
+    }
+
+    private void saveChat(string id, History history, IHistoryReposity historyReposity)
+    {
+        var guid = string.IsNullOrEmpty(id) ? Guid.NewGuid().ToString() : id;
+        var hist = historyReposity.GetHistory(guid);
+        var saveItem = hist == null? 
+            new SavedHistory(guid, history, DateTime.Now, DateTime.Now) :
+            hist with { history = history, LastUpdate = DateTime.Now };
+        
+        historyReposity.Save(saveItem);
+    }
+
+    #region INotifyPropertyChanged Implementation
+    public event PropertyChangedEventHandler PropertyChanged;
+    bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (Object.Equals(storage, value))
+            return false;
+
+        storage = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    #endregion
 }
 
-public record ViewMessage(string Role, string Content, int Position)
+public record MessageViewModel(string Role, string Content, int Position)
 {
-    public static implicit operator ViewMessage(Message message) => 
-        new ViewMessage(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? 3:0);
+    public static implicit operator MessageViewModel(Message message) => 
+        new MessageViewModel(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? 3:0);
 };

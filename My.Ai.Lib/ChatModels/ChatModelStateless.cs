@@ -9,6 +9,8 @@ public class ChatModelStateless : IChatModel
 {   
     readonly Settings _settings;
     Func<string, uint, int, ModelParams> _toModelParams;
+
+    private History history = new List<Message>();
     public ChatModelStateless(string settingsJson, Func<string, uint, int, ModelParams> toModelParams)
     {
         _settings = settingsJson;
@@ -40,6 +42,10 @@ public class ChatModelStateless : IChatModel
         await foreach(var text in chat.Prompt((ChatHistory.Message)input, inferenceParams))
             _ = text;
 
+        history = (History)chat.History();
         return (History)chat.History();
     }
+
+    public async Task<History> GetHistory() => history;
+    
 }

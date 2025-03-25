@@ -29,8 +29,13 @@ public class AIContainer : IContainer
         History baseChat = baseChatJson.ToHistory();
 
         builder.RegisterInstance(baseChat).Named<History>("baseChat");
+        
         builder.Register<Func<ChatMode, IChatModel>>(c => {
             return ContainerExt.ChatViewModelFactory(settingsJson, GlobalExt.ModelParamsDelegate(), baseChat);
+        });
+        
+        builder.Register<Func<ChatMode, History, IChatModel>>(c => {
+            return ContainerExt.ChatViewModelFactory(settingsJson, GlobalExt.ModelParamsDelegate());
         });
 
         _container = builder.Build();
@@ -59,8 +64,8 @@ public static class ContainerExt
             };
         };
     
-    public static Func<ChatMode, IChatModel> ChatViewModelFactory(Settings settingsJson, Func<string, uint, int, ModelParams> modelParamsFunc, History baseChat) =>
-        delegate(ChatMode mode)
+    public static Func<ChatMode, History, IChatModel> ChatViewModelFactory(string settingsJson, Func<string, uint, int, ModelParams> modelParamsFunc) =>
+        delegate(ChatMode mode, History baseChat)
         {
             return mode switch
             {

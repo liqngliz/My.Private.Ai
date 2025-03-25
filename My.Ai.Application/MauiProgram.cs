@@ -3,6 +3,7 @@ using GlobalExtensions;
 using Microsoft.Extensions.Logging;
 using My.Ai.App.Lib.ChatModels;
 using My.Ai.App.Lib.Models;
+using My.Ai.App.Utils;
 using My.Ai.App.ViewModels;
 using My.Ai.Lib.Container;
 using System.Reflection;
@@ -61,6 +62,9 @@ public static class MauiProgram
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<SettingsPage>();
 
+        //Register chat histories
+        builder.Services.AddSingleton<IHistoryReposity>(new HistoryRepository());
+
 		//Register LLM
 		//AIContainer
         string settingsFilename = "settings.json";
@@ -85,11 +89,12 @@ public static class MauiProgram
         var chatHistoryJson = chatTemplateFilename.AppDataReadTextFile();
 
 		var container = new AIContainer(settingsJson, chatHistoryJson, modelPath).Container();
-		Func<ChatMode,IChatModel> chatViewModelFactory = container.Resolve<Func<ChatMode, IChatModel>>();
+		Func<ChatMode, History, IChatModel> chatViewModelFactory = container.Resolve<Func<ChatMode, History, IChatModel>>();
 
         History baseHistory = chatHistoryJson.ToHistory();
         builder.Services.AddSingleton(chatViewModelFactory);
         builder.Services.AddSingleton(baseHistory);
+
 		#if DEBUG
         builder.Logging.AddDebug();
 		#endif

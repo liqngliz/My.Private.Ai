@@ -50,4 +50,6 @@ public class ChatModelPersistent : IChatModel , IDisposable
     {
         _chat.Dispose();
     }
+
+    public async Task<History> GetHistory() => (History)_chat.History();
 }
