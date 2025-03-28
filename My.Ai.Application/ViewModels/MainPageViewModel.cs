@@ -19,25 +19,21 @@ public class MainPageViewModel : INotifyPropertyChanged
     private string chatGuid = string.Empty;
     private History baseChat;
     private IChatModel chatModel;
-    private ObservableCollection<MessageViewModel> history;
 
+    //observable items for command pattern
+    private ObservableCollection<MessageViewModel> history;
     public ObservableCollection<MessageViewModel> History
     {
         get => history;
-        set
-        {
-            SetProperty(ref history, value);
-        }
+        set {SetProperty(ref history, value);}
     }
     
-    string input;
+    private string input;
     public string Input
     {
         set { SetProperty(ref input, value); }
-        get { return input; }
+        get => input;
     }
-
-    private int _count;
 
     private bool isEditing;
     public bool Editable 
@@ -45,6 +41,14 @@ public class MainPageViewModel : INotifyPropertyChanged
         get => !isEditing; 
     }
 
+    private ObservableCollection<SavedHistoryViewModel> savedHistories = new ObservableCollection<SavedHistoryViewModel>();
+    public ObservableCollection<SavedHistoryViewModel> SavedHistories
+    {
+        set{ SetProperty(ref savedHistories, value); }
+        get => savedHistories;
+    }
+    
+    //Commands
     public ICommand Submit {get; }
     public ICommand ClearChat{get; }
     public ICommand NewChat{get; }
@@ -85,8 +89,13 @@ public class MainPageViewModel : INotifyPropertyChanged
             execute: ()=>
             {   
                 isEditing = true;
-                saveChat(chatGuid, chatModel.GetHistory().Result, _historyRepository);
+                saveChat(chatGuid, chatModel.GetHistory().Result, baseChat,_historyRepository);
                 clearChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+
+                SavedHistories = new ObservableCollection<SavedHistoryViewModel>(
+                        _historyRepository.GetHistories().Select(x => (SavedHistoryViewModel)x)
+                        );
+
                 History.Clear();
                 chatGuid = string.Empty;
                 isEditing = false;
@@ -99,6 +108,11 @@ public class MainPageViewModel : INotifyPropertyChanged
         chatModel = _chatFactory(ChatMode.Persistent, baseChat);
         this.history = new ObservableCollection<MessageViewModel>();
         History = new ObservableCollection<MessageViewModel>();
+
+        var saves = _historyRepository.GetHistories().Select(x => (SavedHistoryViewModel)x);
+        SavedHistories = saves.Count() > 0 ? 
+            new ObservableCollection<SavedHistoryViewModel>(saves) : 
+            new ObservableCollection<SavedHistoryViewModel>();
     }
 
 
@@ -116,12 +130,12 @@ public class MainPageViewModel : INotifyPropertyChanged
         model = factory(chatMode, history);
     }
 
-    private void saveChat(string id, History history, IHistoryReposity historyReposity)
+    private void saveChat(string id, History history, History baseChat,IHistoryReposity historyReposity)
     {
         var guid = string.IsNullOrEmpty(id) ? Guid.NewGuid().ToString() : id;
         var hist = historyReposity.GetHistory(guid);
         var saveItem = hist == null? 
-            new SavedHistory(guid, history, DateTime.Now, DateTime.Now) :
+            new SavedHistory(guid, history, baseChat, DateTime.Now, DateTime.Now) :
             hist with { history = history, LastUpdate = DateTime.Now };
         
         historyReposity.Save(saveItem);
@@ -150,3 +164,16 @@ public record MessageViewModel(string Role, string Content, int Position)
     public static implicit operator MessageViewModel(Message message) => 
         new MessageViewModel(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? 3:0);
 };
+
+public record SavedHistoryViewModel(string preview, History history, DateTime LastUpdate)
+{
+    public static implicit operator SavedHistoryViewModel(SavedHistory savedHistory) 
+    {   
+        var starter = savedHistory.baseChat == null ? 3 : savedHistory.baseChat.Messages.Count;
+        bool isNew = savedHistory.history.Messages.Count <= starter;
+        var preview = isNew? "" : savedHistory.history.Messages[starter].Content;
+        int contentSize = preview.Length;
+        if(contentSize > 12) preview = preview.Length > 12 ? preview.Substring(0, 12) + "..." : preview;
+        return new (preview, savedHistory.history, savedHistory.LastUpdate);
+    }
+}

@@ -4,7 +4,7 @@ using My.Ai.App.Lib.Models;
 
 namespace My.Ai.App.Utils;
 
-public record SavedHistory(string Guid, History history, DateTime CreatedDate, DateTime LastUpdate);
+public record SavedHistory(string Guid, History history, History baseChat,DateTime CreatedDate, DateTime LastUpdate);
 
 public interface IHistoryReposity
 {
@@ -35,7 +35,7 @@ public class HistoryRepository : IHistoryReposity
 
     }
 
-    public IEnumerable<SavedHistory> GetHistories() => getHistories();
+    public IEnumerable<SavedHistory> GetHistories() => getHistories().OrderByDescending(x => x.CreatedDate);
     
 
     public void Delete(string Guid)

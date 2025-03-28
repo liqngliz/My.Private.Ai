@@ -37,10 +37,27 @@
                 
                 <Grid Grid.Row="1" Margin="0,20,0,0" Padding="20, 0, 20, 0">
                     <ScrollView>
-                        <VerticalStackLayout>
-                            <!--Bind chat's history items here -->
-                            <Label>Chat History 1</Label>
-                        </VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding SavedHistories}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:SavedHistoryViewModel">
+                                    <Grid VerticalOptions="Center">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <VerticalStackLayout Grid.Column="0" >
+                                            <Label Text="{Binding preview}" FontSize="18"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1" Text="Delete"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        
                     </ScrollView>
                 </Grid>
 
@@ -59,7 +76,7 @@
             
             <Border Grid.RowSpan="2"></Border>
             <ScrollView Grid.Column="1" Grid.Row="0">
-                    <CollectionView ItemsSource="{Binding History}">
+                    <CollectionView ItemsSource="{Binding History}" ItemsUpdatingScrollMode="KeepLastItemInView">
                        <CollectionView.ItemTemplate>
                            <DataTemplate x:DataType="viewmodels:MessageViewModel">
                                <Grid Padding="15,15,15,0">
