@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using LLama.Native;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.FileIO;
 using My.Ai.App.Lib.ChatModels;
 using My.Ai.App.Lib.Models;
 using My.Ai.App.Utils;
@@ -49,14 +51,14 @@ public class MainPageViewModel : INotifyPropertyChanged
     }
     
     //Commands
-    public ICommand Submit {get; }
-    public ICommand ClearChat{get; }
-    public ICommand NewChat{get; }
-
+    public ICommand Submit {get;}
+    public ICommand ClearChat {get;}
+    public ICommand NewChat {get;}
     public MainPageViewModel(Func<ChatMode, History, IChatModel> chatFactory, IHistoryReposity historyReposity, History history)
     {   
         _chatFactory = chatFactory;
         _historyRepository = historyReposity;
+        
         Submit = new Command(
             execute:async () => {
             isEditing = true;
@@ -66,6 +68,8 @@ public class MainPageViewModel : INotifyPropertyChanged
 
             await submit(message, History, chatModel);
             
+            chatGuid = saveChat(chatGuid, chatModel.GetHistory().Result, baseChat,_historyRepository);
+            refreshSave().Invoke();
             isEditing = false;
             OnPropertyChanged(nameof(Editable));
             (Submit as Command).ChangeCanExecute();
@@ -76,7 +80,7 @@ public class MainPageViewModel : INotifyPropertyChanged
             execute: () => 
             {
                 isEditing = true;
-                clearChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+                makeChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
                 History.Clear();
                 isEditing = false;
                 (ClearChat as Command).ChangeCanExecute();
@@ -84,18 +88,13 @@ public class MainPageViewModel : INotifyPropertyChanged
             canExecute: ()=> !isEditing
         );
 
-
         NewChat = new Command(
             execute: ()=>
             {   
                 isEditing = true;
                 saveChat(chatGuid, chatModel.GetHistory().Result, baseChat,_historyRepository);
-                clearChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
-
-                SavedHistories = new ObservableCollection<SavedHistoryViewModel>(
-                        _historyRepository.GetHistories().Select(x => (SavedHistoryViewModel)x)
-                        );
-
+                makeChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+                refreshSave().Invoke();
                 History.Clear();
                 chatGuid = string.Empty;
                 isEditing = false;
@@ -108,11 +107,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         chatModel = _chatFactory(ChatMode.Persistent, baseChat);
         this.history = new ObservableCollection<MessageViewModel>();
         History = new ObservableCollection<MessageViewModel>();
-
-        var saves = _historyRepository.GetHistories().Select(x => (SavedHistoryViewModel)x);
-        SavedHistories = saves.Count() > 0 ? 
-            new ObservableCollection<SavedHistoryViewModel>(saves) : 
-            new ObservableCollection<SavedHistoryViewModel>();
+        refreshSave().Invoke();
     }
 
 
@@ -125,12 +120,80 @@ public class MainPageViewModel : INotifyPropertyChanged
         history.Add(response.Messages.Last());
     }
 
-    private void clearChat(out IChatModel model, Func<ChatMode, History, IChatModel> factory, ChatMode chatMode, History history)
+    private void makeChat(out IChatModel model, Func<ChatMode, History, IChatModel> factory, ChatMode chatMode, History history)
     {
         model = factory(chatMode, history);
     }
 
-    private void saveChat(string id, History history, History baseChat,IHistoryReposity historyReposity)
+    private Action<string> deleteChat(Action refreshSaves) => delegate(string guid)
+    {
+        _historyRepository.Delete(guid);
+        refreshSaves();
+        if(chatGuid == guid)
+        {
+            makeChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
+            History.Clear();
+            chatGuid = string.Empty;
+        }
+    };
+    
+    private Action refreshSave() => delegate
+    {
+        var histories = _historyRepository.GetHistories();
+        var saves = histories.Select(x => x.ToSavedHistoryViewModel(
+                            20,
+                            x.ToSavedHistoryDelete(deleteChat(refreshSave()), isEditable(), setEditable()),
+                            x.ToSavedHistorySelect(selectChat(), isEditable(), setEditable())
+                            ));
+        SavedHistories = saves.Count() > 0 ? 
+            new ObservableCollection<SavedHistoryViewModel>(saves) : 
+            new ObservableCollection<SavedHistoryViewModel>();
+    };
+
+    private Action<bool> setEditable() => delegate(bool editable)
+    {
+        isEditing = editable;
+        OnPropertyChanged(nameof(Editable));
+    };
+
+    private Func<bool> isEditable() => delegate 
+    {
+        return isEditing;
+    };
+
+    private Action <string> selectChat() 
+    {
+        return delegate(string guid)
+        {   
+            if(chatGuid == guid || string.IsNullOrEmpty(guid)) return;
+            
+            var chatHistory = _historyRepository.GetHistory(guid);
+            if(chatHistory == null) return;
+
+            if(!string.IsNullOrEmpty(chatGuid))
+                saveChat(chatGuid, chatModel.GetHistory().Result, baseChat,_historyRepository);
+            
+            chatGuid = guid;
+            baseChat = chatHistory.baseChat;
+            
+            makeChat(out chatModel, _chatFactory, ChatMode.Persistent, chatHistory.history);
+
+            var basechatSize = baseChat.Messages.Count;
+            var diplayedHistory = chatHistory.history.Messages.Select(x => (MessageViewModel)x);
+
+            History = new ObservableCollection<MessageViewModel>();
+
+            var count = 0;
+            foreach(var his in diplayedHistory)
+            {   
+                count++;
+                if(count <= basechatSize) continue;
+                History.Add(his);
+            }
+        };
+    }
+
+    private string saveChat(string id, History history, History baseChat,IHistoryReposity historyReposity)
     {
         var guid = string.IsNullOrEmpty(id) ? Guid.NewGuid().ToString() : id;
         var hist = historyReposity.GetHistory(guid);
@@ -139,6 +202,7 @@ public class MainPageViewModel : INotifyPropertyChanged
             hist with { history = history, LastUpdate = DateTime.Now };
         
         historyReposity.Save(saveItem);
+        return guid;
     }
 
     #region INotifyPropertyChanged Implementation
@@ -165,15 +229,4 @@ public record MessageViewModel(string Role, string Content, int Position)
         new MessageViewModel(message.AuthorRole, message.Content, message.AuthorRole.ToLower().Contains("user")? 3:0);
 };
 
-public record SavedHistoryViewModel(string preview, History history, DateTime LastUpdate)
-{
-    public static implicit operator SavedHistoryViewModel(SavedHistory savedHistory) 
-    {   
-        var starter = savedHistory.baseChat == null ? 3 : savedHistory.baseChat.Messages.Count;
-        bool isNew = savedHistory.history.Messages.Count <= starter;
-        var preview = isNew? "" : savedHistory.history.Messages[starter].Content;
-        int contentSize = preview.Length;
-        if(contentSize > 12) preview = preview.Length > 12 ? preview.Substring(0, 12) + "..." : preview;
-        return new (preview, savedHistory.history, savedHistory.LastUpdate);
-    }
-}
+public record SavedHistoryViewModel(string preview, History history, DateTime LastUpdate, ICommand Delete, ICommand Select);

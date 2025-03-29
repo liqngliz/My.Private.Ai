@@ -15,7 +15,7 @@
         
         <!--General View outer frame end -->
 
-        <Grid Margin="0,15" Grid.Column="0" Grid.Row="0" >
+        <Grid Grid.Column="0" Grid.Row="0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition Height="*"/>
@@ -28,14 +28,14 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Row="0" Grid.Column ="0" FontSize ="20" Padding ="20,5,0,5">Chats</Label>
-                    <HorizontalStackLayout Grid.Row="0" Grid.Column = "2" Padding ="0,0,20,0" Spacing="10">
-                        <Label FontSize ="16" VerticalOptions="End">Search:</Label>
+                    <Label Grid.Row="0" Grid.Column ="0">Chats</Label>
+                    <HorizontalStackLayout Grid.Row="0" Grid.Column = "2" Spacing="10">
+                        <Label VerticalOptions="End">Search:</Label>
                         <Entry WidthRequest="200"></Entry>
                     </HorizontalStackLayout>
                 </Grid>
                 
-                <Grid Grid.Row="1" Margin="0,20,0,0" Padding="20, 0, 20, 0">
+                <Grid Grid.Row="1">
                     <ScrollView>
                         <CollectionView ItemsSource="{Binding SavedHistories}">
                             <CollectionView.ItemTemplate>
@@ -49,10 +49,13 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <VerticalStackLayout Grid.Column="0" >
-                                            <Label Text="{Binding preview}" FontSize="18"/>
+                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                            <VerticalStackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Select}"/>
+                                            </VerticalStackLayout.GestureRecognizers>
+                                            <Label Text="{Binding preview}" />
                                         </VerticalStackLayout>
-                                        <Button Grid.Column="1" Text="Delete"/>
+                                        <Button Grid.Column="1" Text="Delete" Command="{Binding Delete}"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -79,7 +82,7 @@
                     <CollectionView ItemsSource="{Binding History}" ItemsUpdatingScrollMode="KeepLastItemInView">
                        <CollectionView.ItemTemplate>
                            <DataTemplate x:DataType="viewmodels:MessageViewModel">
-                               <Grid Padding="15,15,15,0">
+                               <Grid >
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
@@ -90,8 +93,8 @@
                                         <ColumnDefinition Width="9*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackLayout Grid.RowSpan="2" Grid.Column="{Binding Position}">
-                                        <Label FontSize="18" Text="{Binding Role}" />
-                                        <Label FontSize="16" Padding="0,0,0,0" Text="{Binding Content}"/>                               
+                                        <Label Text="{Binding Role}" />
+                                        <Label Text="{Binding Content}"/>                               
                                     </StackLayout>
                                </Grid>
                            </DataTemplate>
@@ -101,17 +104,15 @@
 
                 <StackLayout Grid.Column="1" Grid.Row="1">
                     <Border/>
-                    <HorizontalStackLayout Spacing="7" Padding="15,0" HorizontalOptions="Center">
+                    <HorizontalStackLayout Spacing="7" HorizontalOptions="Center">
                         <Border/>
 
                         <Button
                             Command="{Binding NewChat}"
                             IsEnabled="{Binding Editable}" 
                             HorizontalOptions="Fill" 
-                            Padding="0,15" 
-                            BackgroundColor="Transparent" 
                             Text="New Chat" 
-                            TextColor="Black" WidthRequest="250"/>
+                            />
                         
                         <Border/>
 
@@ -119,17 +120,14 @@
                             Command="{Binding ClearChat}"
                             IsEnabled="{Binding Editable}"
                             HorizontalOptions="Fill" 
-                            Padding="0,15" 
-                            BackgroundColor="Transparent" 
                             Text="Clear Chat" 
-                            TextColor="Black" WidthRequest="250"
                         />
 
                         <Border/>
                         
                     </HorizontalStackLayout>
                     <Border/>
-                    <Grid Padding="5,10,5,20">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -139,9 +137,9 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <Button Text="Attach" FontSize="24" Grid.Column ="0" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="Black"/>
+                        <Button Text="Attach" Grid.Column ="0" VerticalOptions="Center"/>
                         <Entry x:Name="ChatEntry" ReturnCommand="{Binding Submit}" Text="{Binding Input}" Placeholder="Enter text" Grid.Column="1" VerticalOptions="Center" IsEnabled="{Binding Editable}"></Entry>
-                        <Button Command="{Binding Submit}" Text="Send" FontSize="24" Grid.Column ="2" VerticalOptions="Center" BackgroundColor="Transparent" TextColor="Black" IsEnabled="{Binding Editable}"/>
+                        <Button Command="{Binding Submit}" Text="Send" Grid.Column ="2" VerticalOptions="Center" IsEnabled="{Binding Editable}"/>
                     </Grid>
                 </StackLayout>
             </Grid>
