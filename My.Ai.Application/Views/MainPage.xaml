@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:My.Ai.App.ViewModels"
+             xmlns:savedhistory="clr-namespace:My.Ai.App.Views.Components"
              x:Class="My.Ai.App.MainPage"
              x:DataType="viewmodels:MainPageViewModel">
     <Grid>
@@ -39,24 +40,8 @@
                     <ScrollView>
                         <CollectionView ItemsSource="{Binding SavedHistories}">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="viewmodels:SavedHistoryViewModel">
-                                    <Grid VerticalOptions="Center">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                                            <VerticalStackLayout.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Select}"/>
-                                            </VerticalStackLayout.GestureRecognizers>
-                                            <Label Text="{Binding preview}" />
-                                        </VerticalStackLayout>
-                                        <Button Grid.Column="1" Text="Delete" Command="{Binding Delete}"/>
-                                    </Grid>
+                                <DataTemplate>
+                                    <savedhistory:SavedHistory/>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
