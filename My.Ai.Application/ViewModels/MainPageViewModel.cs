@@ -27,13 +27,13 @@ public class MainPageViewModel : INotifyPropertyChanged
     public ObservableCollection<MessageViewModel> History
     {
         get => history;
-        set {SetProperty(ref history, value);}
+        set {SetProperty(ref history, value, nameof(History));}
     }
     
     private string input;
     public string Input
     {
-        set { SetProperty(ref input, value); }
+        set { SetProperty(ref input, value, nameof(Input)); }
         get => input;
     }
 
@@ -46,7 +46,7 @@ public class MainPageViewModel : INotifyPropertyChanged
     private ObservableCollection<SavedHistoryViewModel> savedHistories = new ObservableCollection<SavedHistoryViewModel>();
     public ObservableCollection<SavedHistoryViewModel> SavedHistories
     {
-        set{ SetProperty(ref savedHistories, value); }
+        set{ SetProperty(ref savedHistories, value, nameof(SavedHistories)); }
         get => savedHistories;
     }
     
@@ -82,6 +82,8 @@ public class MainPageViewModel : INotifyPropertyChanged
                 isEditing = true;
                 makeChat(out chatModel, _chatFactory, ChatMode.Persistent, baseChat);
                 History.Clear();
+                saveChat(chatGuid, chatModel.GetHistory().Result, baseChat,_historyRepository);
+                refreshSave().Invoke();
                 isEditing = false;
                 (ClearChat as Command).ChangeCanExecute();
             },

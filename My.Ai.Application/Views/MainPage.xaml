@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:My.Ai.App.ViewModels"
-             xmlns:savedhistory="clr-namespace:My.Ai.App.Views.Components"
+             xmlns:Components="clr-namespace:My.Ai.App.Views.Components"
              x:Class="My.Ai.App.MainPage"
              x:DataType="viewmodels:MainPageViewModel">
     <Grid>
@@ -41,11 +41,10 @@
                         <CollectionView ItemsSource="{Binding SavedHistories}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <savedhistory:SavedHistory/>
+                                    <Components:SavedHistory/>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                        
                     </ScrollView>
                 </Grid>
 
@@ -66,22 +65,8 @@
             <ScrollView Grid.Column="1" Grid.Row="0">
                     <CollectionView ItemsSource="{Binding History}" ItemsUpdatingScrollMode="KeepLastItemInView">
                        <CollectionView.ItemTemplate>
-                           <DataTemplate x:DataType="viewmodels:MessageViewModel">
-                               <Grid >
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="9*"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="9*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackLayout Grid.RowSpan="2" Grid.Column="{Binding Position}">
-                                        <Label Text="{Binding Role}" />
-                                        <Label Text="{Binding Content}"/>                               
-                                    </StackLayout>
-                               </Grid>
+                           <DataTemplate>
+                                <Components:Chat/>
                            </DataTemplate>
                        </CollectionView.ItemTemplate>
                     </CollectionView>
